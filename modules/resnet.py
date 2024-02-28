@@ -316,7 +316,6 @@ class ResNet(nn.Module):
         R4 = self.avgpool.relprop(R, 1)
 
         def generate_multi_relevance_cams(rel, layer_acts):
-            """generate both xrelevance-cam and relevance-cam"""
             xrel_weights = self._compute_weights(rel, layer_acts, True)
             xrel_cam = layer_acts * xrel_weights
             xrel_cam = torch.sum(xrel_cam, dim=(1), keepdim=True)
@@ -351,11 +350,9 @@ class ResNet(nn.Module):
         return torch.tensor(torch.mean(R, dim=(2, 3), keepdim=True), device='cuda' if torch.cuda.is_available() else 'cpu')
 
     def _compute_weights(self, R, activations, xMode):
-        # xrelevance-cam weights
         if xMode:
             return self._XRelevanceCAM(R, activations)
         
-        # relevance-cam weights
         return torch.mean(R, dim=(2, 3), keepdim=True)
 
     def relprop(self, R, alpha, flag = 'inter'):
