@@ -1,5 +1,3 @@
-# PyTorch Implementation of [XRelevance-CAM]
+# PyTorch Implementation of [XRelevance-CAM: Towards Explainable Tissue Characterisation with Improved Localisation of Pathological Structures in Probe-based Confocal Laser Endomicroscopy]
 
-The main implementation is in the resnet.py file (search for xrelevance-cam).
-
-Majority of the code are borrowed from https://github.com/mongeoroo/Relevance-CAM
+Majority of the code are adapted from https://github.com/mongeoroo/Relevance-CAM
