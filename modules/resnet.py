@@ -346,12 +346,12 @@ class ResNet(nn.Module):
             xr_cam1, r_cam1 = generate_multi_relevance_cams(R1, layer1)
             return xr_cam1, r_cam1, z
 
-    def _XRelevanceCAM(self, R, activations):
+    def novelCAM(self, R, activations):
         return torch.tensor(torch.mean(R, dim=(2, 3), keepdim=True), device='cuda' if torch.cuda.is_available() else 'cpu')
 
     def _compute_weights(self, R, activations, xMode):
         if xMode:
-            return self._XRelevanceCAM(R, activations)
+            return self.novelCAM(R, activations)
         
         return torch.mean(R, dim=(2, 3), keepdim=True)
 
