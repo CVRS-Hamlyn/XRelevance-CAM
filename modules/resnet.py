@@ -316,6 +316,7 @@ class ResNet(nn.Module):
         R4 = self.avgpool.relprop(R, 1)
 
         def generate_multi_relevance_cams(rel, layer_acts):
+            """generate both xrelevance-cam and relevance-cam"""
             xrel_weights = self._compute_weights(rel, layer_acts, True)
             xrel_cam = layer_acts * xrel_weights
             xrel_cam = torch.sum(xrel_cam, dim=(1), keepdim=True)
@@ -346,13 +347,26 @@ class ResNet(nn.Module):
             xr_cam1, r_cam1 = generate_multi_relevance_cams(R1, layer1)
             return xr_cam1, r_cam1, z
 
-    def novelCAM(self, R, activations):
-        return torch.tensor(torch.mean(R, dim=(2, 3), keepdim=True), device='cuda' if torch.cuda.is_available() else 'cpu')
+    def _XRelevanceCAM(self, R, activations): #XRelevanceCAM
+        """main implementation of xrelevance-cam
+        """
+        try:
+            R = R.cpu().detach().numpy() 
+            activations = activations.cpu().detach().numpy()
+        except:
+            R = R.detach().numpy()
+            activations = activations.detach().numpy()
+        weights = R / (np.sum(activations, axis=(2, 3), keepdims=True) + 1e-7) # per channel division operation
+        
+        weights = np.sum(weights, axis=(2, 3), keepdims=True)
+        return torch.tensor(weights, device='cuda' if torch.cuda.is_available() else 'cpu')
 
     def _compute_weights(self, R, activations, xMode):
+        # xrelevance-cam weights
         if xMode:
-            return self.novelCAM(R, activations)
+            return self._XRelevanceCAM(R, activations)
         
+        # relevance-cam weights
         return torch.mean(R, dim=(2, 3), keepdim=True)
 
     def relprop(self, R, alpha, flag = 'inter'):
